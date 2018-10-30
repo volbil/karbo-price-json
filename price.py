@@ -2,31 +2,49 @@ import json
 import requests
 import time
 
+print("Start parsing")
+
 def getData(api):
 	return requests.get(url=api).json()
 
-print("Start parsing")
+api = {
+	"kuna": "https://kuna.io/api/v2/tickers/krbuah",
+	"btctrade": "https://btc-trade.com.ua/api/ticker/krb_uah",
+	"richamsteruah": "https://richamster.com/public/v1/exchange/ticker/?pair=KRB/UAH",
+	"cryptopia": "https://www.cryptopia.co.nz/api/GetMarket/KRB_BTC",
+	"tradeogre": "https://tradeogre.com/api/v1/ticker/BTC-KRB",
+	"richamsterbtc": "https://richamster.com/public/v1/exchange/ticker/?pair=KRB/BTC",
+	"preev": "http://preev.com/pulse/units:btc+usd/sources:bitstamp"
+}
+
 print("Parsing: Cryptopia")
-dataCryptopia = getData("https://www.cryptopia.co.nz/api/GetMarket/KRB_BTC")
+dataCryptopia = getData(api["cryptopia"])
 dataCryptopia = { "sell_btc": float(dataCryptopia["Data"]["AskPrice"]) }
+
 print("Parsing: Tradeogre")
-dataTradeogre = getData("https://tradeogre.com/api/v1/ticker/BTC-KRB")
+dataTradeogre = getData(api["tradeogre"])
 dataTradeogre = { "sell_btc": float(dataTradeogre["ask"]) }
+
 print("Parsing: Kuna")
-dataKuna = getData("https://kuna.io/api/v2/tickers/krbuah")
+dataKuna = getData(api["kuna"])
 dataKuna = { "sell_uah": float(dataKuna["ticker"]["sell"]) }
+
 print("Parsing: BTC-Trade")
-dataBtcTrade = getData("https://btc-trade.com.ua/api/ticker/krb_uah")
-dataBtcTrade = { "sell_uah": float(dataBtcTrade["krb_uah"]["sell"]), "sell_usd": float(dataBtcTrade["krb_uah"]["sell_usd"]), "usd_uah": float(dataBtcTrade["krb_uah"]["usd_rate"]) }
+dataBtcTrade = getData(api["btctrade"])
+dataBtcTrade = { "sell_uah": float(dataBtcTrade["krb_uah"]["sell"]),
+				 "sell_usd": float(dataBtcTrade["krb_uah"]["sell_usd"]),
+				 "usd_uah": float(dataBtcTrade["krb_uah"]["usd_rate"]) }
+
 print("Parsing: Richamster (UAH)")
-dataRichamsterUAH = getData("https://richamster.com/public/v1/exchange/ticker/?pair=KRB/UAH")
+dataRichamsterUAH = getData(api["richamsteruah"])
 dataRichamsterUAH = { "sell_uah": float(dataRichamsterUAH[0]["last"]) }
+
 print("Parsing: Richamster (BTC)")
-dataRichamsterBTC = getData("https://richamster.com/public/v1/exchange/ticker/?pair=KRB/BTC")
+dataRichamsterBTC = getData(api["richamsterbtc"])
 dataRichamsterBTC = { "sell_btc": float(dataRichamsterBTC[0]["last"]) }
 
 print("Processing...")
-btc2usd = float(getData("http://preev.com/pulse/units:btc+usd/sources:bitstamp")["btc"]["usd"]["bitstamp"]["last"])
+btc2usd = float(getData(api["preev"])["btc"]["usd"]["bitstamp"]["last"])
 usd2uah = dataBtcTrade["usd_uah"]
 prices = { "uah": [], "usd": [], "btc": [] }
 
